@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>REINA - LIMITED EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --black: #000000; --white: #ffffff; --nike-red: #ff0000; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Roboto', sans-serif; }
+        
+        body { margin: 0; background-color: var(--black); color: var(--white); height: 100dvh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        /* Pantalla de carga tipo Nike */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--white); z-index: 100; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .nike-logo { font-family: 'Oswald', sans-serif; font-size: 3rem; color: var(--black); letter-spacing: -2px; margin-bottom: 20px; text-transform: uppercase; }
+        
+        .btn-start { 
+            background: var(--black); color: var(--white); border: none; 
+            padding: 15px 50px; font-weight: 900; text-transform: uppercase; 
+            letter-spacing: 2px; cursor: pointer; transform: skewX(-10deg);
+        }
+
+        .container { position: relative; width: 100%; height: 100dvh; display: none; }
+
+        .card { 
+            position: absolute; width: 100%; height: 100%; padding: 40px 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            transition: 0.5s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+
+        .hidden { transform: translateX(100%); opacity: 0; }
+
+        /* Estilo Nike: Texto gigante y cortado */
+        .big-text { 
+            font-family: 'Oswald', sans-serif; font-size: 5rem; line-height: 0.9;
+            text-transform: uppercase; margin: 0; font-weight: 900; text-align: left;
+            -webkit-text-stroke: 1px var(--white); color: transparent;
+        }
+        .fill-text { color: var(--white); -webkit-text-stroke: 0; }
+
+        .description { font-size: 1rem; margin-top: 20px; max-width: 280px; text-align: left; text-transform: uppercase; font-weight: 300; opacity: 0.8; }
+
+        .next-btn { 
+            margin-top: 40px; border: 2px solid var(--white); background: transparent; 
+            color: var(--white); padding: 10px 30px; font-weight: 900; cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Regalo Estilo "Drop" de zapatillas */
+        .drop-container { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 20px; }
+        .gift-box { width: 250px; height: 120px; background: var(--nike-red); border: 4px solid var(--white); display: flex; justify-content: center; align-items: center; transition: 0.5s; cursor: pointer; }
+        .gift-box span { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--white); }
+        
+        .photo-surprise { 
+            position: absolute; width: 280px; height: 280px; 
+            object-fit: cover; opacity: 0; transform: scale(0.5); 
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 8px solid var(--white); z-index: 10;
+        }
+
+        .open .photo-surprise { opacity: 1; transform: scale(1) rotate(-5deg); }
+        .open .gift-box { transform: scale(0); opacity: 0; }
+
+        .badge { background: var(--nike-red); padding: 5px 10px; font-size: 0.7rem; font-weight: 900; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <div class="nike-logo">EDITION 2026</div>
+        <button class="btn-start" onclick="activarTodo()">UNLOCK ❤️</button>
+    </div>
+
+    <audio id="musicaFondo" loop preload="auto">
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container" id="mainContainer">
+        <div id="p1" class="card">
+            <div class="badge">SEASON PREVIEW</div>
+            <h1 class="big-text">MY <br><span class="fill-text">QUEEN</span></h1>
+            <p class="description">Amarte no es solo un sentimiento, es mi forma más pura y sincera de existir. Eres la MVP de mi vida.</p>
+            <button class="next-btn" onclick="next('p1','p2')">CONTINUE</button>
+        </div>
+
+        <div id="p2" class="card hidden">
+            <div class="badge">EXCLUSIVE DROP</div>
+            <h1 class="big-text">BE MY <br><span class="fill-text">VALENTINE?</span></h1>
+            <div style="display:flex; gap: 10px; margin-top: 30px;">
+                <button class="next-btn" style="background: white; color: black;" onclick="next('p2','p3')">YES</button>
+                <button class="next-btn" id="btnNo" onmouseover="escapar(this)">NO</button>
+            </div>
+        </div>
+
+        <div id="p3" class="card hidden">
+            <div class="badge">UNBOXING CONFIRMED</div>
+            <h1 class="big-text" style="font-size: 3rem;">YOUR <br><span class="fill-text">SURPRISE</span></h1>
+            <div class="drop-container" id="regalo" onclick="this.classList.toggle('open')">
+                <div class="gift-box"><span>TAP TO UNBOX</span></div>
+                <img src="foto.jpeg" class="photo-surprise">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('musicaFondo');
+
+        function activarTodo() {
+            audio.play().catch(e => console.log("Audio ready"));
+            document.getElementById('overlay').style.transform = 'translateY(-100%)';
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+            }, 500);
+        }
+
+        function next(actual, sig) {
+            audio.play();
+            document.getElementById(actual).style.transform = 'translateX(-100%)';
+            document.getElementById(actual).style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById(sig).classList.remove('hidden');
+            }, 300);
+        }
+
+        function escapar(btn) {
+            btn.style.position = 'fixed';
+            btn.style.left = Math.random() * 70 + 10 + '%';
+            btn.style.top = Math.random() * 70 + 10 + '%';
+        }
+    </script>
+</body>
+</html>
