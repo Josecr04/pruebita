@@ -1,139 +1,152 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>REINA - LIMITED EDITION</title>
+    <title>CONCEPT STORE | 2026 EDITION</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        :root { --black: #000000; --white: #ffffff; --nike-red: #ff0000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Roboto', sans-serif; }
-        
-        body { margin: 0; background-color: var(--black); color: var(--white); height: 100dvh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        :root { --black: #000; --white: #fff; --grey: #1a1a1a; --neon: #ccff00; --transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--black); color: var(--white); overflow: hidden; height: 100dvh; }
 
-        /* Pantalla de carga tipo Nike */
-        #overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--white); z-index: 100; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
+        /* HEADER ESTATICO */
+        header { position: fixed; top: 0; width: 100%; padding: 20px; z-index: 1000; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .logo { font-family: 'Oswald', sans-serif; font-size: 1.8rem; letter-spacing: -1px; cursor: pointer; }
+        .nav-icons { display: flex; gap: 20px; font-weight: 900; font-size: 0.8rem; }
 
-        .nike-logo { font-family: 'Oswald', sans-serif; font-size: 3rem; color: var(--black); letter-spacing: -2px; margin-bottom: 20px; text-transform: uppercase; }
-        
-        .btn-start { 
-            background: var(--black); color: var(--white); border: none; 
-            padding: 15px 50px; font-weight: 900; text-transform: uppercase; 
-            letter-spacing: 2px; cursor: pointer; transform: skewX(-10deg);
-        }
-
-        .container { position: relative; width: 100%; height: 100dvh; display: none; }
-
-        .card { 
-            position: absolute; width: 100%; height: 100%; padding: 40px 20px;
+        /* CONTENEDOR DE PAGINAS */
+        .page-wrapper { width: 100%; height: 100dvh; position: relative; }
+        section { 
+            position: absolute; width: 100%; height: 100%; 
             display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-            transition: 0.5s cubic-bezier(0.8, 0, 0.2, 1);
+            padding: 0 10%; opacity: 0; pointer-events: none;
+            transform: translateY(50px); transition: var(--transition);
         }
+        section.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 
-        .hidden { transform: translateX(100%); opacity: 0; }
-
-        /* Estilo Nike: Texto gigante y cortado */
-        .big-text { 
-            font-family: 'Oswald', sans-serif; font-size: 5rem; line-height: 0.9;
-            text-transform: uppercase; margin: 0; font-weight: 900; text-align: left;
-            -webkit-text-stroke: 1px var(--white); color: transparent;
-        }
-        .fill-text { color: var(--white); -webkit-text-stroke: 0; }
-
-        .description { font-size: 1rem; margin-top: 20px; max-width: 280px; text-align: left; text-transform: uppercase; font-weight: 300; opacity: 0.8; }
-
-        .next-btn { 
-            margin-top: 40px; border: 2px solid var(--white); background: transparent; 
-            color: var(--white); padding: 10px 30px; font-weight: 900; cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        /* Regalo Estilo "Drop" de zapatillas */
-        .drop-container { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 20px; }
-        .gift-box { width: 250px; height: 120px; background: var(--nike-red); border: 4px solid var(--white); display: flex; justify-content: center; align-items: center; transition: 0.5s; cursor: pointer; }
-        .gift-box span { font-family: 'Oswald', sans-serif; font-size: 2rem; color: var(--white); }
+        /* TIPOGRAFIA NIKE STYLE */
+        .hero-text { font-family: 'Oswald', sans-serif; font-size: clamp(4rem, 15vw, 10rem); line-height: 0.85; text-transform: uppercase; margin-bottom: 20px; }
+        .outline { -webkit-text-stroke: 1.5px var(--white); color: transparent; }
         
-        .photo-surprise { 
-            position: absolute; width: 280px; height: 280px; 
-            object-fit: cover; opacity: 0; transform: scale(0.5); 
-            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 8px solid var(--white); z-index: 10;
+        /* BOTONES DINAMICOS */
+        .btn-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 30px; }
+        .btn { 
+            padding: 15px 40px; border: 2px solid var(--white); background: transparent; 
+            color: var(--white); font-weight: 900; text-transform: uppercase; 
+            cursor: pointer; transition: 0.3s; letter-spacing: 1px;
         }
+        .btn:hover, .btn.active-btn { background: var(--white); color: var(--black); }
+        .btn-neon { border-color: var(--neon); color: var(--neon); }
+        .btn-neon:hover { background: var(--neon); color: var(--black); }
 
-        .open .photo-surprise { opacity: 1; transform: scale(1) rotate(-5deg); }
-        .open .gift-box { transform: scale(0); opacity: 0; }
+        /* GRID DE PRODUCTOS (SIMULADO) */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 800px; }
+        .item { background: var(--grey); aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-weight: 900; text-transform: uppercase; font-size: 0.7rem; border: 1px solid #333; cursor: pointer; }
+        .item:hover { border-color: var(--white); }
 
-        .badge { background: var(--nike-red); padding: 5px 10px; font-size: 0.7rem; font-weight: 900; margin-bottom: 10px; }
+        /* FOOTER DE NAVEGACION RAPIDA */
+        .page-indicator { position: fixed; bottom: 20px; left: 20px; font-family: 'Oswald'; color: #444; }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <div class="nike-logo">EDITION 2026</div>
-        <button class="btn-start" onclick="activarTodo()">UNLOCK ❤️</button>
-    </div>
-
-    <audio id="musicaFondo" loop preload="auto">
-        <source src="musica.mp3" type="audio/mpeg">
-    </audio>
-
-    <div class="container" id="mainContainer">
-        <div id="p1" class="card">
-            <div class="badge">SEASON PREVIEW</div>
-            <h1 class="big-text">MY <br><span class="fill-text">QUEEN</span></h1>
-            <p class="description">Amarte no es solo un sentimiento, es mi forma más pura y sincera de existir. Eres la MVP de mi vida.</p>
-            <button class="next-btn" onclick="next('p1','p2')">CONTINUE</button>
+    <header>
+        <div class="logo" onclick="goTo('p1')">CORE™</div>
+        <div class="nav-icons">
+            <span onclick="goTo('p2')">NEW</span>
+            <span onclick="goTo('p5')">MEN</span>
+            <span onclick="goTo('p8')">WOMEN</span>
+            <span onclick="goTo('p15')">CART(0)</span>
         </div>
+    </header>
 
-        <div id="p2" class="card hidden">
-            <div class="badge">EXCLUSIVE DROP</div>
-            <h1 class="big-text">BE MY <br><span class="fill-text">VALENTINE?</span></h1>
-            <div style="display:flex; gap: 10px; margin-top: 30px;">
-                <button class="next-btn" style="background: white; color: black;" onclick="next('p2','p3')">YES</button>
-                <button class="next-btn" id="btnNo" onmouseover="escapar(this)">NO</button>
+    <div class="page-indicator" id="p-idx">PAGE: 01/20</div>
+
+    <div class="page-wrapper">
+        <section id="p1" class="active">
+            <h1 class="hero-text">JUST<br><span class="outline">CORE</span></h1>
+            <div class="btn-group">
+                <button class="btn" onclick="goTo('p2')">SHOP NEW ARRIVALS</button>
+                <button class="btn btn-neon" onclick="goTo('p20')">MEMBER ACCESS</button>
             </div>
-        </div>
+        </section>
 
-        <div id="p3" class="card hidden">
-            <div class="badge">UNBOXING CONFIRMED</div>
-            <h1 class="big-text" style="font-size: 3rem;">YOUR <br><span class="fill-text">SURPRISE</span></h1>
-            <div class="drop-container" id="regalo" onclick="this.classList.toggle('open')">
-                <div class="gift-box"><span>TAP TO UNBOX</span></div>
-                <img src="foto.jpeg" class="photo-surprise">
+        <section id="p2">
+            <h1 class="hero-text" style="font-size: 4rem;">SELECT<br>LINE</h1>
+            <div class="btn-group">
+                <button class="btn" onclick="goTo('p3')">PERFORMANCE</button>
+                <button class="btn" onclick="goTo('p4')">LIFESTYLE</button>
+                <button class="btn" onclick="goTo('p5')">JORDAN</button>
+                <button class="btn" onclick="goTo('p6')">TERREX</button>
             </div>
-        </div>
+        </section>
+
+        <section id="p3">
+            <div class="badge">RUNNING / TRAINING</div>
+            <h1 class="hero-text" style="font-size: 3rem;">GEAR UP</h1>
+            <div class="grid">
+                <div class="item" onclick="goTo('p18')">Pro Shoes</div>
+                <div class="item" onclick="goTo('p18')">Tech Tee</div>
+                <div class="item" onclick="goTo('p18')">Shorts 5"</div>
+                <div class="item" onclick="goTo('p18')">Compression</div>
+            </div>
+            <button class="btn" style="margin-top:20px" onclick="goTo('p2')">BACK</button>
+        </section>
+
+        <section id="p4"><h1 class="hero-text">STREET<br>WEAR</h1><button class="btn" onclick="goTo('p5')">NEXT</button></section>
+        <section id="p5"><h1 class="hero-text">MEN's<br>COLLECTION</h1><button class="btn" onclick="goTo('p8')">TO WOMEN</button></section>
+        <section id="p6"><h1 class="hero-text">OUTDOOR</h1><button class="btn" onclick="goTo('p7')">EXPLORE</button></section>
+        <section id="p7"><h1 class="hero-text">ADVENTURE</h1><button class="btn" onclick="goTo('p1')">RESET</button></section>
+        <section id="p8"><h1 class="hero-text">WOMEN's<br>ELITE</h1><button class="btn" onclick="goTo('p9')">VIEW ALL</button></section>
+        <section id="p9"><h1 class="hero-text">ACCESSORIES</h1><button class="btn" onclick="goTo('p10')">GO</button></section>
+        <section id="p10"><h1 class="hero-text">SALE<br>50% OFF</h1><button class="btn btn-neon" onclick="goTo('p11')">GET DEALS</button></section>
+        <section id="p11"><h1 class="hero-text">NIKE BY YOU</h1><button class="btn" onclick="goTo('p12')">CUSTOMIZE</button></section>
+        <section id="p12"><h1 class="hero-text">LIMITED</h1><button class="btn" onclick="goTo('p13')">RESERVE</button></section>
+        <section id="p13"><h1 class="hero-text">SNKRS</h1><button class="btn" onclick="goTo('p14')">UPCOMING</button></section>
+        <section id="p14"><h1 class="hero-text">VINTAGE</h1><button class="btn" onclick="goTo('p15')">SHOP</button></section>
+        <section id="p15"><h1 class="hero-text">YOUR<br>CART</h1><button class="btn" onclick="goTo('p16')">CHECKOUT</button></section>
+        <section id="p16"><h1 class="hero-text">SHIPPING</h1><button class="btn" onclick="goTo('p17')">PAYMENT</button></section>
+        <section id="p17"><h1 class="hero-text">PAYMENT</h1><button class="btn" onclick="goTo('p18')">CONFIRM</button></section>
+        <section id="p18"><h1 class="hero-text">SUCCESS</h1><button class="btn" onclick="goTo('p19')">TRACK</button></section>
+        <section id="p19"><h1 class="hero-text">SUPPORT</h1><button class="btn" onclick="goTo('p20')">CONTACT</button></section>
+        <section id="p20">
+            <h1 class="hero-text">JOIN<br>THE CLUB</h1>
+            <p style="margin-bottom:20px">BECOME A MEMBER FOR EXCLUSIVE DROPS.</p>
+            <button class="btn btn-neon" onclick="goTo('p1')">RESTART EXPERIENCE</button>
+        </section>
     </div>
 
     <script>
-        const audio = document.getElementById('musicaFondo');
+        function goTo(id) {
+            // Desactivar todas las secciones
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            
+            // Activar la seleccionada
+            const target = document.getElementById(id);
+            target.classList.add('active');
 
-        function activarTodo() {
-            audio.play().catch(e => console.log("Audio ready"));
-            document.getElementById('overlay').style.transform = 'translateY(-100%)';
-            setTimeout(() => {
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'block';
-            }, 500);
+            // Actualizar indicador de página
+            const pageNum = id.replace('p', '');
+            document.getElementById('p-idx').innerText = `PAGE: ${pageNum.padStart(2, '0')}/20`;
+            
+            // Efecto de sonido (opcional si lo agregas luego)
+            console.log(`Navigating to: ${id}`);
         }
 
-        function next(actual, sig) {
-            audio.play();
-            document.getElementById(actual).style.transform = 'translateX(-100%)';
-            document.getElementById(actual).style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById(sig).classList.remove('hidden');
-            }, 300);
-        }
-
-        function escapar(btn) {
-            btn.style.position = 'fixed';
-            btn.style.left = Math.random() * 70 + 10 + '%';
-            btn.style.top = Math.random() * 70 + 10 + '%';
-        }
+        // Navegación por teclado
+        document.addEventListener('keydown', (e) => {
+            if(e.key === "ArrowRight") {
+                let current = document.querySelector('section.active').id;
+                let num = parseInt(current.replace('p', ''));
+                if(num < 20) goTo('p' + (num + 1));
+            }
+            if(e.key === "ArrowLeft") {
+                let current = document.querySelector('section.active').id;
+                let num = parseInt(current.replace('p', ''));
+                if(num > 1) goTo('p' + (num - 1));
+            }
+        });
     </script>
 </body>
 </html>
